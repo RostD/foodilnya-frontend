@@ -1,0 +1,88 @@
+<div class="row">
+  <div class="col-9">
+
+    <!-- DISH LIST -->
+    <table class="mt-2 table-sm table-hover w-100" *ngIf="!loading">
+      <thead>
+      <tr>
+        <th>Код</th>
+        <th>Наименование</th>
+      </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let dish of dishes | filter:filterName " class="pointer" (click)="showDetails(dish)" [ngClass]="getClass(dish.id)">
+          <td>{{dish.id}}</td>
+          <td>{{dish.name}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- END DISH LIST -->
+
+  </div>
+  <div class="col">
+
+    <!-- RIGHT BLOCK -->
+    <div class="mt-1 mb-1 mr-1 text-right" id="dishlist-settings-block">
+      <template #popTemplate>
+        <div class="form-group row">
+          <div class="col-sm-12">
+            <div class="input-group input-group-sm">
+              <input id="filterName" type="search" [(ngModel)]="filterName" placeholder="Наименование содержит" class="p-1 form-control form-control-sm" style="height: 30px;">
+              <button class="btn btn-outline-secondary input-group-addon pointer" (click)="clearFilterName()">X</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-group mt-2">
+          <button type="button" class="pointer btn btn-danger btn-sm btn-block" (click)="clearFilters()">Сбросить настройки</button>
+        </div>
+      </template>
+
+          <img src="../../assets/img/icons/shock/gear.png" height="30" width="30"
+               id="dishfilter"
+               class="pointer"
+
+               [popover]="popTemplate"
+               placement="left"
+               popoverTitle="Настройка списка"
+
+               data-toggle="tooltip"
+               data-placement="left"
+               data-animation="false"
+               title="Настройка списка"
+
+               (click)="togglingFilter()"
+
+          />
+    </div>
+
+    <!-- DISH CARD -->
+    <div *ngIf="selectedDish" class="card">
+      <img src="../../assets/img/no_photo.jpg" class="w-75 h-75 mx-auto card-img-top " />
+      <div class="card-block">
+        <div class="card-text">
+          <p *ngFor="let attr of selectedDish.attributes">
+            {{attr.name}} &#x2014; {{attr.value}} <span *ngIf="attr.unit">{{attr.unit}}</span>
+          </p>
+        </div>
+      </div>
+      <div class="card-block">
+          <label>Оценка клиентов: </label><br />
+          <rating class="mx-auto" *ngIf="selectedDish" [(ngModel)]="selectedDish.rate" [max]="maxRate" [readonly]="true"></rating>
+      </div>
+      <div class="card-block">
+        <a href="#" class="card-link">Подробнее</a>
+      </div>
+    </div>
+    <!-- END DISH CARD -->
+
+    <!-- END RIGHT BLOCK -->
+  </div>
+
+
+  <!-- STATUS BAR -->
+  <div   class="progress fixed-top" >
+    <div *ngIf="loading" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+  </div>
+  <!-- END STATUS BAR -->
+</div>

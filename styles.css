@@ -1,0 +1,8 @@
+/* Global CSS */
+.pointer{
+  cursor: pointer;
+}
+
+#dishlist-settings-block .popover{
+  width:500px;
+}
