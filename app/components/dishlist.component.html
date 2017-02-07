@@ -1,3 +1,78 @@
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Настройка списка</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group row">
+          <div class="col-sm-12">
+            <div class="input-group input-group-sm">
+              <input id="filterName" type="search" [(ngModel)]="filter.name" placeholder="Наименование содержит" class="p-1 form-control form-control-sm" style="height: 30px;">
+              <button class="btn btn-outline-secondary input-group-addon pointer" (click)="clearFilterName()">X</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="border-top:1px solid #CCCCCC;border-bottom:1px solid #CCCCCC; padding:4px; margin-bottom: 10px;">
+          <div class="row">
+            <div class="col">
+              <h6>Доступные теги</h6>
+              <bs-sortable
+                [(ngModel)]="tags"
+                fieldName="name"
+                itemClass="badge badge-info mr-1 move"
+                itemActiveClass="sortable-item-active"
+                placeholderItem="Доступных нет"
+                placeholderClass="badge badge-default"
+                wrapperClass="sortable-wrapper"
+              ></bs-sortable>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <h6>И</h6>
+              <bs-sortable
+                [(ngModel)]="filter.tagsAND"
+                fieldName="name"
+                itemClass="badge badge-info mr-1 move"
+                itemActiveClass="sortable-item-active"
+                placeholderItem="Перетащите сюда"
+                placeholderClass="badge badge-default"
+                wrapperClass="sortable-wrapper"
+              ></bs-sortable>
+            </div>
+            <div class="col">
+              <h6>Или</h6>
+              <bs-sortable
+                [(ngModel)]="filter.tagsOR"
+                fieldName="name"
+                itemClass="badge badge-info mr-1 move"
+                itemActiveClass="sortable-item-active"
+                placeholderItem="Перетащите сюда"
+                placeholderClass="badge badge-default"
+                wrapperClass="sortable-wrapper"
+              ></bs-sortable>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-group mt-2">
+          <button type="button" class="pointer btn btn-danger btn-sm btn-block" (click)="clearFilters()">Сбросить настройки</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+      </div>
+    </div>
+  </div>
+</div>
+<!-- END MODAL -->
+
 <div class="row">
   <div class="col-9">
 
@@ -10,7 +85,7 @@
       </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let dish of dishes | filter:filterName " class="pointer" (click)="showDetails(dish)" [ngClass]="getClass(dish.id)">
+        <tr *ngFor="let dish of dishes | filterName:filter.name | tagsAND:filter.tagsAND | tagsOR:filter.tagsOR " class="pointer" (click)="showDetails(dish)" [ngClass]="getClass(dish.id)">
           <td>{{dish.id}}</td>
           <td>{{dish.name}}</td>
         </tr>
@@ -23,47 +98,34 @@
 
     <!-- RIGHT BLOCK -->
     <div class="mt-1 mb-1 mr-1 text-right" id="dishlist-settings-block">
-      <template #popTemplate>
-        <div class="form-group row">
-          <div class="col-sm-12">
-            <div class="input-group input-group-sm">
-              <input id="filterName" type="search" [(ngModel)]="filterName" placeholder="Наименование содержит" class="p-1 form-control form-control-sm" style="height: 30px;">
-              <button class="btn btn-outline-secondary input-group-addon pointer" (click)="clearFilterName()">X</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="input-group mt-2">
-          <button type="button" class="pointer btn btn-danger btn-sm btn-block" (click)="clearFilters()">Сбросить настройки</button>
-        </div>
-      </template>
 
           <img src="../../assets/img/icons/shock/gear.png" height="30" width="30"
                id="dishfilter"
                class="pointer"
-
-               [popover]="popTemplate"
-               placement="left"
-               popoverTitle="Настройка списка"
 
                data-toggle="tooltip"
                data-placement="left"
                data-animation="false"
                title="Настройка списка"
 
-               (click)="togglingFilter()"
-
+               (click)="showModal()"
           />
     </div>
+
 
     <!-- DISH CARD -->
     <div *ngIf="selectedDish" class="card">
       <img src="../../assets/img/no_photo.jpg" class="w-75 h-75 mx-auto card-img-top " />
       <div class="card-block">
         <div class="card-text">
-          <p *ngFor="let attr of selectedDish.attributes">
-            {{attr.name}} &#x2014; {{attr.value}} <span *ngIf="attr.unit">{{attr.unit}}</span>
+          <p *ngFor="let prop of selectedDish.properties">
+            {{prop.name}} &#x2014; {{prop.value}} <span *ngIf="prop.unit">{{prop.unit}}</span>
           </p>
+        </div>
+      </div>
+      <div class="card-block">
+        <div class="card-text">
+          <span *ngFor="let tag of selectedDish.tags" class="badge badge-info" style="margin-right:2px;">{{tag.name}}</span>
         </div>
       </div>
       <div class="card-block">
@@ -82,7 +144,9 @@
 
   <!-- STATUS BAR -->
   <div   class="progress fixed-top" >
-    <div *ngIf="loading" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+    <div *ngIf="dishesLoading" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
   </div>
+
+  <div id="alert" style="max-width: 600px; right: 0; left: inherit;" class="fixed-top alert" [ngClass]="alert.type" role="alert">{{alert.text}}</div>
   <!-- END STATUS BAR -->
 </div>

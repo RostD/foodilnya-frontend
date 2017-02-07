@@ -11,10 +11,10 @@ export class DishesService{
   constructor(@Inject(Http) private http: Http){}
 
   getDishes(): Observable <Dish[]> {
-    return this.http.get(API_HOST+'/dishes').map(this.revealDishes);
+    return this.http.get(API_HOST+'/dishes').map(this.revealData);
   }
 
-  revealDishes(res: Response){
+  revealData(res: Response){
     let body = res.json();
     return body.data||[];
 

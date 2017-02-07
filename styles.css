@@ -3,6 +3,10 @@
   cursor: pointer;
 }
 
+.move{
+  cursor: move;
+}
+
 #dishlist-settings-block .popover{
   width:500px;
 }

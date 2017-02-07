@@ -4,7 +4,7 @@ import { AppRouter } from './router.module';
 import { FormsModule } from '@angular/forms';
 import {HttpModule} from "@angular/http";
 
-import { PopoverModule } from 'ng2-bootstrap';
+import {PopoverModule, SortableModule, ModalModule} from 'ng2-bootstrap';
 import { RatingModule } from 'ng2-bootstrap';
 
 import { AppComponent }  from './app.component';
@@ -14,9 +14,10 @@ import {LoginComponent} from "./components/login.component";
 import {AuthUserService} from "./services/authuser.service";
 import {NavigationComponent} from "./components/navigation.component";
 import {DishesService} from "./services/dishes.service";
-
-
-import {FilterPipe} from "./pipes/filter.pipe";
+import {FilterNamePipe} from "./pipes/filterName.pipe";
+import {FilterTagsANDPipe} from "./pipes/filterTagsAND.pipe";
+import {TagsService} from "./services/tags.service";
+import {FilterTagsORPipe} from "./pipes/filterTagsOR";
 
 
 
@@ -28,6 +29,8 @@ import {FilterPipe} from "./pipes/filter.pipe";
     FormsModule,
     PopoverModule.forRoot(),
     RatingModule.forRoot(),
+    SortableModule.forRoot(),
+    ModalModule.forRoot(),
   ],
   declarations: [
     AppComponent,
@@ -35,12 +38,15 @@ import {FilterPipe} from "./pipes/filter.pipe";
     HomeComponent,
     LoginComponent,
     NavigationComponent,
-    FilterPipe,
+    FilterNamePipe,
+    FilterTagsANDPipe,
+    FilterTagsORPipe,
 
   ],
   providers:[
     AuthUserService,
-    DishesService
+    DishesService,
+    TagsService,
   ],
   bootstrap:    [ AppComponent ]
 })
